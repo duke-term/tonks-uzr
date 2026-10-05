@@ -405,20 +405,20 @@ l = 36 #18 #30.3 #um
 
   #thermalmobility
   [./D_temp]
-  type = DerivativeParsedMaterial
-  property_name = D_temperature
-  coupled_variables = 'T eta'
-  #material_property_names = 'M_Zr'
-  expression = '-(6/T)*(1-eta)'
-  outputs = exodus      
+    type = DerivativeParsedMaterial
+    property_name = D_temperature
+    coupled_variables = 'T eta'
+    #material_property_names = 'M_Zr'
+    expression = '-(6/T)*(1-eta)'
+    outputs = exodus      
   [../]
   [./D_temp_vac]
-  type = DerivativeParsedMaterial
-  property_name = D_temperature_vac
-  coupled_variables = 'T eta'
-  #material_property_names = 'M_Zr'
-  expression = '(6/T)*(1-eta)'
-  outputs = exodus      
+    type = DerivativeParsedMaterial
+    property_name = D_temperature_vac
+    coupled_variables = 'T eta'
+    #material_property_names = 'M_Zr'
+    expression = '(6/T)*(1-eta)'
+    outputs = exodus      
   [../]
 
   # Free energy of the liquid
@@ -664,29 +664,30 @@ l = 36 #18 #30.3 #um
 #[]
 
 [Executioner]
-type = Transient
-solve_type = PJFNK
-#petsc_options_iname = '-pc_type -ksp_gmres_restart -sub_pc_type -pc_asm_overlap'
-#petsc_options_value = 'asm      31                  lu           1'
-petsc_options_iname = '-pc_type -pc_factor_shift_type'
-petsc_options_value = 'lu nonzero'
-l_max_its = 100
-l_tol = 1e-4
-nl_max_its = 15
-nl_rel_tol = 1e-8
-nl_abs_tol = 1e-9
-automatic_scaling = true
-#steady_state_detection = true
-#steady_state_tolerance = 1e-6#1e-8
-#compute_scaling_once = false
-end_time = 1.0368e7
-[./TimeStepper]
-type = IterationAdaptiveDT
-growth_factor = 1.2
-cutback_factor = 0.5
-optimal_iterations = 7
-dt = 1e-4 #1
-[]
+  type = Transient
+  solve_type = PJFNK
+  #petsc_options_iname = '-pc_type -ksp_gmres_restart -sub_pc_type -pc_asm_overlap'
+  #petsc_options_value = 'asm      31                  lu           1'
+  petsc_options_iname = '-pc_type -pc_factor_shift_type'
+  petsc_options_value = 'lu nonzero'
+  l_max_its = 100
+  l_tol = 1e-4
+  nl_max_its = 15
+  nl_rel_tol = 1e-8
+  nl_abs_tol = 1e-9
+  automatic_scaling = true
+  #steady_state_detection = true
+  #steady_state_tolerance = 1e-6#1e-8
+  #compute_scaling_once = false
+  end_time = 1.0368e7
+  
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    growth_factor = 1.2
+    cutback_factor = 0.5
+    optimal_iterations = 7
+    dt = 1e-4 #1
+  [../]
 []
 
 [Postprocessors]

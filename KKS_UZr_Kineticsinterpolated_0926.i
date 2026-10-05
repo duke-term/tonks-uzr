@@ -405,20 +405,20 @@ l = 36 #18 #30.3 #um
 
   #thermalmobility
   [./D_temp]
-  type = DerivativeParsedMaterial
-  property_name = D_temperature
-  coupled_variables = 'T eta c_zr c_v'
-  material_property_names = 'D_zr_eff'
-  expression = '-((D_zr_eff*6*c_zr*(1-c_zr-c_v)*(1-eta))/(T^2))'
-  outputs = exodus
+    type = DerivativeParsedMaterial
+    property_name = D_temperature
+    coupled_variables = 'T eta c_zr c_v'
+    material_property_names = 'D_zr_eff'
+    expression = '-((D_zr_eff*6*c_zr*(1-c_zr-c_v)*(1-eta))/(T^2))'
+    outputs = exodus
   [../]
   [./D_temp_vac]
-  type = DerivativeParsedMaterial
-  property_name = D_temperature_vac
-  coupled_variables = 'T eta c_zr c_v'
-  material_property_names = 'D_zr_eff'
-  expression = '((D_zr_eff*6*c_zr*(1-c_zr-c_v)*(1-eta))/(T^2))'
-  outputs = exodus
+    type = DerivativeParsedMaterial
+    property_name = D_temperature_vac
+    coupled_variables = 'T eta c_zr c_v'
+    material_property_names = 'D_zr_eff'
+    expression = '((D_zr_eff*6*c_zr*(1-c_zr-c_v)*(1-eta))/(T^2))'
+    outputs = exodus
   [../]
   #could not replace the Q*/R properly, but did add in the concentration & diffusion dependence
   #testing testing

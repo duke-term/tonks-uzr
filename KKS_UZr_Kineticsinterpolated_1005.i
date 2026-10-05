@@ -12,7 +12,7 @@ l = 36 #18 #30.3 #um
 #interfacial_mobility = '${fparse 0.7}' #um^3/pJsec
 #m_c_chem = '${fparse 0.7}'
 
-#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_0926.i
+#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1005.i
 
  
 [Mesh] 
@@ -185,21 +185,21 @@ l = 36 #18 #30.3 #um
   #   outputs = exodus
   # []
 
-  [zr_specific_heat]
-    type = DerivativeParsedMaterial
-    property_name = 'cp_zr'
-    coupled_variables = 'T'
-    expression = '(164.812818966 + 0.623108738*T - 0.000982894*T^2 + 0.000000550*T^3)'
-    outputs = exodus
-  []
+  # [zr_specific_heat]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'cp_zr'
+  #   coupled_variables = 'T'
+  #   expression = '(164.812818966 + 0.623108738*T - 0.000982894*T^2 + 0.000000550*T^3)'
+  #   outputs = exodus
+  # []
 
-  [u_specific_heat]
-    type = DerivativeParsedMaterial
-    property_name = 'cp_u'
-    coupled_variables = 'T'
-    expression = '(121.4650125626 - 0.0974672888*T + 0.0002986755*T^2 - 0.0000001184*T^3)'
-    outputs = exodus
-  []
+  # [u_specific_heat]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'cp_u'
+  #   coupled_variables = 'T'
+  #   expression = '(121.4650125626 - 0.0974672888*T + 0.0002986755*T^2 - 0.0000001184*T^3)'
+  #   outputs = exodus
+  # []
 
   [fission_rate]
     type = DerivativeParsedMaterial
@@ -223,24 +223,39 @@ l = 36 #18 #30.3 #um
   # []
 
   # Only Temp, U-20Zr
+  # [fuel_thermal_conductivity]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'thermal_conductivity'
+  #   coupled_variables = 'T'
+  #   constant_names = 'aa1 aa2 aa3'
+  #   constant_expressions = '7.336 0.011791 9.38e-6'
+  #   expression = '(aa1 + (aa2)*T + (aa3)*T^2)'
+  #   outputs = exodus
+  # []
+
+  # [fuel_specific_heat]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'specific_heat'
+  #   coupled_variables = 'T c_zr_l'
+  #   material_property_names = 'cp_zr cp_u'
+  #   expression = '(cp_zr*c_zr_l + cp_u*(1-c_zr_l))' # J/kg*K
+  #   outputs = exodus
+  # []
+
   [fuel_thermal_conductivity]
-    type = DerivativeParsedMaterial
-    property_name = 'thermal_conductivity'
-    coupled_variables = 'T'
-    constant_names = 'aa1 aa2 aa3'
-    constant_expressions = '7.336 0.011791 9.38e-6'
-    expression = '(aa1 + (aa2)*T + (aa3)*T^2)'
+    type = GenericConstantMaterial
+    prop_names = 'thermal_conductivity'
+    prop_values = 20
     outputs = exodus
   []
 
   [fuel_specific_heat]
-    type = DerivativeParsedMaterial
-    property_name = 'specific_heat'
-    coupled_variables = 'T c_zr_l'
-    material_property_names = 'cp_zr cp_u'
-    expression = '(cp_zr*c_zr_l + cp_u*(1-c_zr_l))' # J/kg*K
+    type = GenericConstantMaterial
+    prop_names = 'specific_heat'
+    prop_values = 3
     outputs = exodus
   []
+
 
   [./h_eta]
     type = SwitchingFunctionMaterial
@@ -250,11 +265,11 @@ l = 36 #18 #30.3 #um
   [../]
 
   [./h_fuel]
-  type = DerivativeParsedMaterial
-  property_name = 'h_fuel'
-  material_property_names = 'h'
-  expression = '(1-h)'
-  outputs = exodus
+    type = DerivativeParsedMaterial
+    property_name = 'h_fuel'
+    material_property_names = 'h'
+    expression = '(1-h)'
+    outputs = exodus
   [../]
 
   # [fuel_gaseous_swelling] ###NOT---NEEDED### right now
@@ -357,53 +372,53 @@ l = 36 #18 #30.3 #um
 
 #Effective Diffusivity of Zr
   [./D_zr_eff]
-  type = DerivativeParsedMaterial
-  property_name = D_zr_eff
-  material_property_names = 'D_zr h_fuel'
-  expression = 'D_zr*h_fuel + 0.5*D_zr*(1-h_fuel)'
-  outputs = exodus
-  []
+    type = DerivativeParsedMaterial
+    property_name = D_zr_eff
+    material_property_names = 'D_zr h_fuel'
+    expression = 'D_zr*h_fuel + 0.5*D_zr*(1-h_fuel)'
+    outputs = exodus
+  [../]
 #Diffusivity of Zr in gamma phase
   [./D_zr]
-  type = DerivativeParsedMaterial
-  property_name = D_zr
-  coupled_variables = 'T'
-  material_property_names = 'Q D0'
-  constant_names = 'R'
-  constant_expressions = '8.314e12'
-  expression = 'D0*exp(-(Q)/(R*T))'
-  outputs = exodus
-  []
+    type = DerivativeParsedMaterial
+    property_name = D_zr
+    coupled_variables = 'T'
+    material_property_names = 'Q D0'
+    constant_names = 'R'
+    constant_expressions = '8.314e12'
+    expression = 'D0*exp(-(Q)/(R*T))'
+    outputs = exodus
+  [../]
 #Diffusivityprefactor
   [./D_zr_o]
-  type = DerivativeParsedMaterial
-  property_name = D0
-  coupled_variables = 'c_zr_l'
-  #constant_names = X_Zr
-  #constant_expressions = '0.225'
-  #expression = '(exp(-6.15 - 18.5*c_zr + 21*(c_zr)^2))*(${time_scale}/(${length_scale})^2)'
-  expression = '(exp(-6.15 - 18.5*c_zr_l + 21*(c_zr_l)^2))*(${time_scale}/(${length_scale})^2)'
-  outputs = exodus
-  []
+    type = DerivativeParsedMaterial
+    property_name = D0
+    coupled_variables = 'c_zr_l'
+    #constant_names = X_Zr
+    #constant_expressions = '0.225'
+    #expression = '(exp(-6.15 - 18.5*c_zr + 21*(c_zr)^2))*(${time_scale}/(${length_scale})^2)'
+    expression = '(exp(-6.15 - 18.5*c_zr_l + 21*(c_zr_l)^2))*(${time_scale}/(${length_scale})^2)'
+    outputs = exodus
+  [../]
 #Activationenergy
   [./Q]
-  type = DerivativeParsedMaterial
-  property_name = Q
-  coupled_variables = 'c_zr_l'
-  #constant_names = X_Zr
-  #constant_expressions = '0.225'
-  expression = '(128 - 107*c_zr_l + 174*(c_zr_l)^2)*(1000/(${energy_scale}))'
-  outputs = exodus
-  []
+    type = DerivativeParsedMaterial
+    property_name = Q
+    coupled_variables = 'c_zr_l'
+    #constant_names = X_Zr
+    #constant_expressions = '0.225'
+    expression = '(128 - 107*c_zr_l + 174*(c_zr_l)^2)*(1000/(${energy_scale}))'
+    outputs = exodus
+  [../]
 
 #Effective diffusivity of vacancies
   [./D_v_eff]
-  type = DerivativeParsedMaterial
-  property_name = D_v_eff
-  material_property_names = 'D_zr h_fuel'
-  expression = '1.5*D_zr*h_fuel + 2*D_zr*(1-h_fuel)'
-  outputs = exodus
-  []
+    type = DerivativeParsedMaterial
+    property_name = D_v_eff
+    material_property_names = 'D_zr h_fuel'
+    expression = '1.5*D_zr*h_fuel + 2*D_zr*(1-h_fuel)'
+    outputs = exodus
+  [../]
 #Effective mobility of vacancies
   [./M_v_eff]
     type = DerivativeParsedMaterial
@@ -416,25 +431,41 @@ l = 36 #18 #30.3 #um
 
 
   #thermalmobility
-  [./D_temp]
-  type = DerivativeParsedMaterial
-  property_name = D_temperature
-  coupled_variables = 'T eta c_zr_l'
-  constant_names = 'Q_star R'
-  constant_expressions = '1.2e17 8.314e12'
-  material_property_names = 'D_zr_eff'
-  expression = '-((D_zr_eff*Q_star*c_zr_l*(1-c_zr_l))/(R*T^2))'
-  outputs = exodus
+  # [./D_temp]
+  #   type = DerivativeParsedMaterial
+  #   property_name = D_temperature
+  #   coupled_variables = 'T eta c_zr_l'
+  #   constant_names = 'Q_star R'
+  #   constant_expressions = '1.2e17 8.314e12'
+  #   material_property_names = 'D_zr_eff'
+  #   expression = '-((D_zr_eff*Q_star*c_zr_l*(1-c_zr_l))/(R*T^2))'
+  #   outputs = exodus
+  # [../]
+  # [./D_temp_vac]
+  #   type = DerivativeParsedMaterial
+  #   property_name = D_temperature_vac
+  #   coupled_variables = 'T eta c_v_l'
+  #   constant_names = 'Q_star R'
+  #   constant_expressions = '1.2e17 8.314e12'
+  #   material_property_names = 'D_v_eff'
+  #   expression = '((D_v_eff*Q_star*c_v_l*(1-c_v_l))/(R*T^2))'
+  #   outputs = exodus
+  # [../]
+
+   [./D_temp]
+    type = DerivativeParsedMaterial
+    property_name = D_temperature
+    coupled_variables = 'T'
+    expression = '-(6/T)'
+    outputs = exodus
   [../]
+
   [./D_temp_vac]
-  type = DerivativeParsedMaterial
-  property_name = D_temperature_vac
-  coupled_variables = 'T eta c_v_l'
-  constant_names = 'Q_star R'
-  constant_expressions = '1.2e17 8.314e12'
-  material_property_names = 'D_v_eff'
-  expression = '((D_v_eff*Q_star*c_v_l*(1-c_v_l))/(R*T^2))'
-  outputs = exodus
+    type = DerivativeParsedMaterial
+    property_name = D_temperature_vac
+    coupled_variables = 'T'
+    expression = '(6/T)'
+    outputs = exodus
   [../]
   
     
@@ -555,14 +586,14 @@ l = 36 #18 #30.3 #um
     type = MatDiffusion
     variable = w1
     diffusivity = D_temperature
-    v = 'T'
+    v = 'T eta'
   [../]
 
   [./thermomigrationvac]
     type = MatDiffusion
     variable = w2
     diffusivity = D_temperature_vac
-    v = 'T'
+    v = 'T eta'
   [../]
 
   #
@@ -681,29 +712,29 @@ l = 36 #18 #30.3 #um
 #[]
 
 [Executioner]
-type = Transient
-solve_type = PJFNK
-#petsc_options_iname = '-pc_type -ksp_gmres_restart -sub_pc_type -pc_asm_overlap'
-#petsc_options_value = 'asm      31                  lu           1'
-petsc_options_iname = '-pc_type -pc_factor_shift_type'
-petsc_options_value = 'lu nonzero'
-l_max_its = 100
-l_tol = 1e-4
-nl_max_its = 15
-nl_rel_tol = 1e-8
-nl_abs_tol = 1e-9
-automatic_scaling = true
-#steady_state_detection = true
-#steady_state_tolerance = 1e-6#1e-8
-#compute_scaling_once = false
-end_time = 1.0368e7
-[./TimeStepper]
-type = IterationAdaptiveDT
-growth_factor = 1.2
-cutback_factor = 0.5
-optimal_iterations = 7
-dt = 1e-4 #1
-[]
+  type = Transient
+  solve_type = PJFNK
+  #petsc_options_iname = '-pc_type -ksp_gmres_restart -sub_pc_type -pc_asm_overlap'
+  #petsc_options_value = 'asm      31                  lu           1'
+  petsc_options_iname = '-pc_type -pc_factor_shift_type'
+  petsc_options_value = 'lu nonzero'
+  l_max_its = 100
+  l_tol = 1e-4
+  nl_max_its = 15
+  nl_rel_tol = 1e-8
+  nl_abs_tol = 1e-9
+  automatic_scaling = true
+  #steady_state_detection = true
+  #steady_state_tolerance = 1e-6#1e-8
+  #compute_scaling_once = false
+  end_time = 1.0368e7
+  [./TimeStepper]
+    type = IterationAdaptiveDT
+    growth_factor = 1.2
+    cutback_factor = 0.5
+    optimal_iterations = 7
+    dt = 1e-4 #1
+  [../]
 []
 
 [Postprocessors]
@@ -728,5 +759,5 @@ dt = 1e-4 #1
 [Outputs]
   exodus = true
   csv = true
-  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output0926
+  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1005
 []
