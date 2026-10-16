@@ -12,8 +12,8 @@ l = 36 #18 #30.3 #um
 #interfacial_mobility = '${fparse 0.7}' #um^3/pJsec
 #m_c_chem = '${fparse 0.7}'
 
-#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1005total.i
- 
+#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1011-2.i
+
 [Mesh] 
   coord_type = 'RZ'
   # rz_coord_axis = 'X'
@@ -167,22 +167,31 @@ l = 36 #18 #30.3 #um
     #spheat_model = savage
     #outputs = exodus
   #[]
+  
+ # defining weight frac of zr for the coeff concentration dependencies
+  # [weight_frac_zr]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'wt_zr'
+  #   coupled_variables = 'c_zr'
+  #   expression = '((c_zr*91.224)/(c_zr*91.224 + (1-c_zr)*238.0289))'
+  #   outputs = exodus
+  # []
 
-  #[coeff_aa1]
-  #  type = DerivativeParsedMaterial
-  #  property_name = 'aa1'
-  #  coupled_variables = 'c_zr_l'
-  #  expression = '(17.5 * (1-2.23*c_zr_l)/(1+1.61*c_zr_l))'
-  #  outputs = exodus
-  #[]
+  # [coeff_aa1]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'aa1'
+  #   material_property_names = 'wt_zr'
+  #   expression = '(17.5 * (1-2.23*wt_zr)/(1+1.61*wt_zr))'
+  #   outputs = exodus
+  # []
 
-  #[coeff_aa2]
-  # type = DerivativeParsedMaterial
-  # property_name = 'aa2'
-  # coupled_variables = 'c_zr_l'
-  # expression = '(0.0154 * (1+0.061*c_zr_l)/(1+1.61*c_zr_l))'
-  #  outputs = exodus
-  #[]
+  # [coeff_aa2]
+  #   type = DerivativeParsedMaterial
+  #   property_name = 'aa2'
+  #   material_property_names = 'wt_zr'
+  #   expression = '(0.0154 * (1+0.061*wt_zr)/(1+1.61*wt_zr))'
+  #   outputs = exodus
+  # []
 
   [zr_specific_heat]
     type = DerivativeParsedMaterial
@@ -209,11 +218,11 @@ l = 36 #18 #30.3 #um
     outputs = exodus
   []
 
-  # Temp and concentration
+  #Temp and concentration
   # [fuel_thermal_conductivity]
   #   type = DerivativeParsedMaterial
   #   property_name = 'thermal_conductivity'
-  #   coupled_variables = 'T c_zr_l'
+  #   coupled_variables = 'T'
   #   material_property_names = 'aa1 aa2'
   #   constant_names = 'aa3'
   #   constant_expressions = '9.38e-6'
@@ -221,23 +230,23 @@ l = 36 #18 #30.3 #um
   #   outputs = exodus
   # []
 
-  #Only Temp, U-20Zr
+  #Only Temp, U-10Zr weight frac values for coeffs
   [fuel_thermal_conductivity]
-    type = DerivativeParsedMaterial
-    property_name = 'thermal_conductivity'
-    coupled_variables = 'T'
-    constant_names = 'aa1 aa2 aa3'
-    constant_expressions = '7.336 0.011791 9.38e-6'
-    expression = '(aa1 + (aa2)*T + (aa3)*T^2)'
-    outputs = exodus
+   type = DerivativeParsedMaterial
+   property_name = 'thermal_conductivity'
+   coupled_variables = 'T'
+   constant_names = 'aa1 aa2 aa3'
+   constant_expressions = '11.7119 0.013345 9.38e-6'
+   expression = '(aa1 + (aa2)*T + (aa3)*T^2)'
+   outputs = exodus
   []
 
   [fuel_specific_heat]
     type = DerivativeParsedMaterial
     property_name = 'specific_heat'
-    coupled_variables = 'T c_zr_l'
+    coupled_variables = 'c_zr'
     material_property_names = 'cp_zr cp_u'
-    expression = '(cp_zr*c_zr_l + cp_u*(1-c_zr_l))' # J/kg*K
+    expression = '(cp_zr*c_zr + cp_u*(1-c_zr))' # J/kg*K
     outputs = exodus
   []
 
@@ -433,22 +442,32 @@ l = 36 #18 #30.3 #um
   [./D_temp]
     type = DerivativeParsedMaterial
     property_name = D_temperature
-    coupled_variables = 'T eta c_zr_l'
+    coupled_variables = 'T eta c_zr'
     constant_names = 'Q_star R'
     constant_expressions = '1.2e17 8.314e12'
     material_property_names = 'D_zr_eff'
-    expression = '-((D_zr_eff*Q_star*c_zr_l*(1-c_zr_l))/(R*T^2))'
+    expression = '-((D_zr_eff*Q_star*c_zr*(1-c_zr))/(R*T^2))'
     outputs = exodus
   [../]
+  # [./D_temp_vac]
+  #   type = DerivativeParsedMaterial
+  #   property_name = D_temperature_vac
+  #   coupled_variables = 'T eta c_zr c_v'
+  #   constant_names = 'Q_star R'
+  #   constant_expressions = '1.2e17 8.314e12'
+  #   material_property_names = 'D_zr_eff'
+  #   expression = '((D_zr_eff*Q_star*c_zr*(1-c_zr-c_v))/(R*T^2))'
+  #   outputs = exodus
+  # [../]
   [./D_temp_vac]
-    type = DerivativeParsedMaterial
-    property_name = D_temperature_vac
-    coupled_variables = 'T eta c_v_l'
-    constant_names = 'Q_star R'
-    constant_expressions = '1.2e17 8.314e12'
-    material_property_names = 'D_v_eff'
-    expression = '((D_v_eff*Q_star*c_v_l*(1-c_v_l))/(R*T^2))'
-    outputs = exodus
+   type = DerivativeParsedMaterial
+   property_name = D_temperature_vac
+   coupled_variables = 'T eta c_v'
+   constant_names = 'Q_star R'
+   constant_expressions = '1.2e17 8.314e12'
+   material_property_names = 'D_v_eff'
+   expression = '((D_v_eff*Q_star*c_v*(1-c_v))/(R*T^2))'
+   outputs = exodus
   [../]
 
   #[./D_temp]
@@ -737,11 +756,18 @@ l = 36 #18 #30.3 #um
 []
 
 [Postprocessors]
+
   [Area_annulus]
     type = ElementIntegralVariablePostprocessor
     variable = eta
     outputs = csv
   []
+
+  [dt]
+    type = TimestepSize
+    outputs = exodus
+  []
+
 []
 
 
@@ -758,5 +784,5 @@ l = 36 #18 #30.3 #um
 [Outputs]
   exodus = true
   csv = true
-  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1005total
+  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1011-2
 []
