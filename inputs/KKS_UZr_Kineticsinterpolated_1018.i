@@ -512,7 +512,7 @@ l = 36 #18 #30.3 #um
     property_name = fs
     material_property_names = 'a_zr_s a_v_s a_u_s'
     coupled_variables = 'c_zr_s c_v_s'
-    expression = '(a_zr_s)*(0-c_zr_s)^2+(a_v_s)*(1-c_v_s)^2+(a_u_s)*(1-c_zr_s-c_v_s-0)^2'
+    expression = '(a_zr_s)*(1e-6-c_zr_s)^2+(a_v_s)*(1-c_v_s)^2+(a_u_s)*(1-c_zr_s-c_v_s-1e-6)^2'
     #expression = '(0-c_zr_s)^2+(1-c_v_s)^2+(1-c_zr_s-c_v_s-0)^2'
   [../]
 
