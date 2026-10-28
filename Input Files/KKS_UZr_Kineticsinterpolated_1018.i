@@ -73,12 +73,14 @@ l = 36 #18 #30.3 #um
   [./w1]
     order = FIRST
     family = LAGRANGE
+    scaling = 1e-15
   [../]
 
   # chemical potential Vacancy
   [./w2]
     order = FIRST
     family = LAGRANGE
+    scaling = 1e-15
   [../]
 
 

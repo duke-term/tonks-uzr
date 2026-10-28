@@ -12,7 +12,7 @@ l = 36 #18 #30.3 #um
 #interfacial_mobility = '${fparse 0.7}' #um^3/pJsec
 #m_c_chem = '${fparse 0.7}'
 
-#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1018.i
+#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1019.i
 
 [Mesh] 
   coord_type = 'RZ'
@@ -736,5 +736,5 @@ l = 36 #18 #30.3 #um
 [Outputs]
   exodus = true
   csv = true
-  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1018
+  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1019
 []
