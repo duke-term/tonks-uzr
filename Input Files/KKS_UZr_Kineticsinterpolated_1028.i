@@ -12,7 +12,7 @@ l = 36 #18 #30.3 #um
 #interfacial_mobility = '${fparse 0.7}' #um^3/pJsec
 #m_c_chem = '${fparse 0.7}'
 
-#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1019.i
+#mpirun -n 8 /blue/michael.tonks/cj.oleary/projects/moose/modules/combined/combined-opt -i KKS_UZr_Kineticsinterpolated_1028.i
 
 [Mesh] 
   coord_type = 'RZ'
@@ -435,27 +435,47 @@ l = 36 #18 #30.3 #um
     outputs = exodus
   [../]
     
+  [a_l]
+    type = DerivativeParsedMaterial
+    property_name = a_l
+    coupled_variables = 'T'
+    constant_names = 'R c_zr_l_eq'
+    constant_expressions = '8.314e12 0.225'
+    expression = '(1e-15)*((R*T)/(4*c_zr_l_eq*(1-c_zr_l_eq)))'
+    outputs = exodus
+  [../]
+
+  
   # Free energy of the fuel
   [./fl]
     type = DerivativeParsedMaterial
     property_name = fl
-    constant_names = 'a_zr_l a_v_l a_u_l'
-    constant_expressions = '1 1 1'
+    material_property_names = 'a_l'
     coupled_variables = 'c_zr_l c_v_l'
-    expression = '(a_zr_l)*(0.225-c_zr_l)^2+(a_v_l)*(1e-6-c_v_l)^2+(a_u_l)*(1-c_zr_l-c_v_l-0.775)^2'
-    #expression = '(0.225-c_zr_l)^2+(1e-6-c_v_l)^2+(1-c_zr_l-c_v_l-0.775)^2'
+    expression = '(a_l)*(c_zr_l-0.225)^2+(a_l*100)*(c_v_l-1e-6)^2+(a_l)*((1-c_zr_l-c_v_l)-0.775)^2'
+    #expression = '(c_zr_l-0.225)^2+(c_v_l-1e-6)^2+((1-c_zr_l-c_v_l)-0.775)^2'
   [../]
 
+  [a_s]
+    type = DerivativeParsedMaterial
+    property_name = a_s
+    coupled_variables = 'T'
+    constant_names = 'R c_zr_s_eq'
+    constant_expressions = '8.314e12 1e-6'
+    expression = '(1e-15)*((R*T)/(4*c_zr_s_eq*(1-c_zr_s_eq)))'
+    outputs = exodus
+  [../]
+  
   # Free energy of the annulus
   [./fs]
     type = DerivativeParsedMaterial
     property_name = fs
-    constant_names = 'a_zr_s a_v_s a_u_s'
-    constant_expressions = '1 1 1'
+    material_property_names = 'a_s'
     coupled_variables = 'c_zr_s c_v_s'
-    expression = '(a_zr_s)*(1e-6-c_zr_s)^2+(a_v_s)*(1-c_v_s)^2+(a_u_s)*(1-c_zr_s-c_v_s-1e-6)^2'
-    #expression = '(0-c_zr_s)^2+(1-c_v_s)^2+(1-c_zr_s-c_v_s-0)^2'
+    expression = '(a_s)*(c_zr_s-1e-6)^2+(a_s*100)*(c_v_s-1)^2+(a_s)*((1-c_zr_s-c_v_s)-1e-6)^2'
+    #expression = '(c_zr_s-1e-6)^2+(c_v_s-1)^2+((1-c_zr_s-c_v_s)-1e-6)^2'
   [../]
+
 
   # h(eta)
 
@@ -736,5 +756,5 @@ l = 36 #18 #30.3 #um
 [Outputs]
   exodus = true
   csv = true
-  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1019
+  file_base = /blue/michael.tonks/cj.oleary/uzr/outputs/KKSUZr_output1028
 []
